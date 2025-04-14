@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <title>Galerie d'images via Proxy</title>
   <meta charset="UTF-8">
+  <title>Galerie Drive avec popup</title>
   <style>
     body {
       font-family: sans-serif;
       margin: 20px;
-      background: #f8f9fa;
+      background: #f7f7f7;
     }
     input[type="text"] {
       width: 100%;
@@ -17,7 +17,7 @@
     }
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 20px;
     }
     .card {
@@ -25,6 +25,7 @@
       padding: 10px;
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
     }
     .card img {
       width: 100%;
@@ -38,13 +39,47 @@
       font-size: 14px;
       color: #555;
     }
+    .card button {
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Popup */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
   </style>
 </head>
 <body>
 
-<h1>Galerie d'images</h1>
-<input type="text" id="searchInput" placeholder="Rechercher par tag ou nom...">
+<h1>Galerie Drive</h1>
+<input type="text" id="searchInput" placeholder="Rechercher par nom ou tag...">
 <div class="gallery" id="gallery"></div>
+
+<!-- Modal -->
+<div id="modal" class="modal" onclick="closeModal()">
+  <img id="modalImage" src="">
+</div>
 
 <script>
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrk1ebEfqCbL3YyeHwGcbdyL5LYMynAUortsmSgAKmJdjqS5bP69JAQszKbgs_Tm3SEa1ySJCtDYp6/pub?gid=0&single=true&output=tsv";
@@ -70,9 +105,10 @@
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <img src="${item.proxy}" alt="image">
+        <img src="${item.url}" alt="${item.nom}">
         <h3>${item.nom}</h3>
         <p>${item.tags}</p>
+        <button onclick="openModal('${item.url}')">🔍 Agrandir</button>
       `;
       gallery.appendChild(card);
     });
@@ -88,6 +124,16 @@
       );
       renderGallery(filtered);
     });
+  }
+
+  function openModal(src) {
+    document.getElementById("modalImage").src = src;
+    document.getElementById("modal").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("modal").style.display = "none";
+    document.getElementById("modalImage").src = "";
   }
 
   fetchData().then(data => {
