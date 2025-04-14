@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Galerie d'images - Google Sheets</title>
+  <title>Galerie d'images</title>
   <meta charset="UTF-8">
   <style>
     body {
@@ -47,7 +47,7 @@
 <div class="gallery" id="gallery"></div>
 
 <script>
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrk1ebEfqCbL3YyeHwGcbdyL5LYMynAUortsmSgAKmJdjqS5bP69JAQszKbgs_Tm3SEa1ySJCtDYp6/pub?gid=0&single=true&output=tsv"; // Remplace avec le lien TSV public
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrk1ebEfqCbL3YyeHwGcbdyL5LYMynAUortsmSgAKmJdjqS5bP69JAQszKbgs_Tm3SEa1ySJCtDYp6/pub?gid=0&single=true&output=tsv";
 
   async function fetchData() {
     const response = await fetch(SHEET_URL);
@@ -83,8 +83,8 @@
     input.addEventListener("input", () => {
       const query = input.value.toLowerCase();
       const filtered = data.filter(item =>
-        item['Nom du fichier'].toLowerCase().includes(query) ||
-        item['Tags générés'].toLowerCase().includes(query)
+        (item['Nom du fichier'] || "").toLowerCase().includes(query) ||
+        (item['Tags générés'] || "").toLowerCase().includes(query)
       );
       renderGallery(filtered);
     });
