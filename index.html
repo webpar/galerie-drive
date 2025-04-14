@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Galerie Drive - Mix Images & Docs</title>
+  <title>Galerie Drive - Images directes</title>
   <style>
     body {
       font-family: sans-serif;
@@ -22,12 +22,6 @@
     }
     .card img {
       width: 100%;
-      border-radius: 8px;
-    }
-    .card iframe {
-      width: 100%;
-      height: 250px;
-      border: none;
       border-radius: 8px;
     }
     .card h3 {
@@ -66,7 +60,7 @@
   </style>
 </head>
 <body>
-<h1>Galerie Drive (images et documents)</h1>
+<h1>Galerie Drive (images seulement)</h1>
 <div class="gallery" id="gallery"></div>
 
 <div id="modal" class="modal" onclick="closeModal()">
@@ -77,15 +71,13 @@
 const data = [
   {
     nom: "Image 1",
-    type: "image",
     url: "https://drive.google.com/uc?export=view&id=1zO4TuQraQJfxnVLhMk9xIfNUGqA3-Efr",
     tags: "plage, réunion, panneau"
   },
   {
-    nom: "Document Google",
-    type: "doc",
-    url: "https://docs.google.com/document/d/e/2PACX-1vSdmxcxIMv-N4YKzNrsLTMB2TCiHDm8Q9hM-32FuaoLwHLkT1v1rtLWtMdswjbKRi659aaTZn4Ut0KP/pub",
-    tags: "texte, test, publication"
+    nom: "Image 2",
+    url: "https://drive.google.com/uc?export=view&id=11AxJN1BlY9A3R7-KPwmhtjeTwKgPQ2VR",
+    tags: "icône, graphique, noir"
   }
 ];
 
@@ -95,19 +87,12 @@ function renderGallery() {
   data.forEach(item => {
     const card = document.createElement("div");
     card.className = "card";
-    let content = '';
-
-    if (item.type === "image") {
-      content = `<img src="${item.url}" alt="${item.nom}">
-                 <button onclick=\"openModal('${item.url}')\">🔍 Agrandir</button>`;
-    } else if (item.type === "doc") {
-      content = `<iframe src="${item.url}?embedded=true"></iframe>`;
-    }
 
     card.innerHTML = `
+      <img src="${item.url}" alt="${item.nom}">
       <h3>${item.nom}</h3>
-      ${content}
       <p>${item.tags}</p>
+      <button onclick=\"openModal('${item.url}')\">🔍 Agrandir</button>
     `;
     gallery.appendChild(card);
   });
