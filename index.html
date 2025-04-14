@@ -47,12 +47,12 @@
 <div class="gallery" id="gallery"></div>
 
 <script>
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrk1ebEfqCbL3YyeHwGcbdyL5LYMynAUortsmSgAKmJdjqS5bP69JAQszKbgs_Tm3SEa1ySJCtDYp6/pub?gid=0&single=true&output=tsv"; // mets ton lien TSV ici
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrk1ebEfqCbL3YyeHwGcbdyL5LYMynAUortsmSgAKmJdjqS5bP69JAQszKbgs_Tm3SEa1ySJCtDYp6/pub?gid=0&single=true&output=tsv";
 
   async function fetchData() {
     const response = await fetch(SHEET_URL);
     const text = await response.text();
-    const rows = text.trim().split("\n").map(r => r.split("\t"));
+    const rows = text.trim().split(\"\\n\").map(r => r.split(\"\\t\"));
     const headers = rows[0].map(h => h.trim().toLowerCase());
     const data = rows.slice(1);
 
@@ -64,13 +64,13 @@
   }
 
   function renderGallery(data) {
-    const gallery = document.getElementById("gallery");
-    gallery.innerHTML = "";
+    const gallery = document.getElementById(\"gallery\");
+    gallery.innerHTML = \"\";
     data.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "card";
+      const card = document.createElement(\"div\");
+      card.className = \"card\";
       card.innerHTML = `
-        <img src="${item.url}" alt="image">
+        <img src=\"${item.url}\" alt=\"image\">
         <h3>${item.nom}</h3>
         <p>${item.tags}</p>
       `;
@@ -79,12 +79,12 @@
   }
 
   function setupSearch(data) {
-    const input = document.getElementById("searchInput");
-    input.addEventListener("input", () => {
+    const input = document.getElementById(\"searchInput\");
+    input.addEventListener(\"input\", () => {
       const query = input.value.toLowerCase();
       const filtered = data.filter(item =>
-        (item.nom || "").toLowerCase().includes(query) ||
-        (item.tags || "").toLowerCase().includes(query)
+        (item.nom || \"\").toLowerCase().includes(query) ||
+        (item.tags || \"\").toLowerCase().includes(query)
       );
       renderGallery(filtered);
     });
