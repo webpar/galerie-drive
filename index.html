@@ -100,11 +100,12 @@ function renderGallery(data) {
   data.forEach(item => {
     const card = document.createElement("div");
     card.className = "card";
+    const imageSrc = item.image_directe || item.url;
     card.innerHTML = `
-      <img src="${item.url}" alt="${item.nom}">
+      <img src="${imageSrc}" alt="${item.nom}">
       <h3>${item.nom}</h3>
       <p>${item.tags}</p>
-      <button onclick=\"openModal('${item.url}')\">🔍 Agrandir</button>
+      <button onclick=\"openModal('${imageSrc}')\">🔍 Agrandir</button>
     `;
     gallery.appendChild(card);
   });
