@@ -2,22 +2,16 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Galerie Drive avec popup</title>
+  <title>Galerie Drive - Mix Images & Docs</title>
   <style>
     body {
       font-family: sans-serif;
+      background: #f5f5f5;
       margin: 20px;
-      background: #f7f7f7;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 20px;
-      font-size: 16px;
     }
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 20px;
     }
     .card {
@@ -25,10 +19,15 @@
       padding: 10px;
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      position: relative;
     }
     .card img {
       width: 100%;
+      border-radius: 8px;
+    }
+    .card iframe {
+      width: 100%;
+      height: 250px;
+      border: none;
       border-radius: 8px;
     }
     .card h3 {
@@ -37,7 +36,7 @@
     }
     .card p {
       font-size: 14px;
-      color: #555;
+      color: #666;
     }
     .card button {
       margin-top: 8px;
@@ -48,8 +47,6 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
-    /* Popup */
     .modal {
       display: none;
       position: fixed;
@@ -65,82 +62,68 @@
     .modal img {
       max-width: 90%;
       max-height: 90%;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
     }
   </style>
 </head>
 <body>
-
-<h1>Galerie Drive</h1>
-<input type="text" id="searchInput" placeholder="Rechercher par nom ou tag...">
+<h1>Galerie Drive (images et documents)</h1>
 <div class="gallery" id="gallery"></div>
 
-<!-- Modal -->
 <div id="modal" class="modal" onclick="closeModal()">
   <img id="modalImage" src="">
 </div>
 
 <script>
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrk1ebEfqCbL3YyeHwGcbdyL5LYMynAUortsmSgAKmJdjqS5bP69JAQszKbgs_Tm3SEa1ySJCtDYp6/pub?gid=0&single=true&output=tsv";
-
-  async function fetchData() {
-    const response = await fetch(SHEET_URL);
-    const text = await response.text();
-    const rows = text.trim().split("\n").map(r => r.split("\t"));
-    const headers = rows[0].map(h => h.trim().toLowerCase());
-    const data = rows.slice(1);
-
-    return data.map(row => {
-      let obj = {};
-      headers.forEach((h, i) => obj[h] = row[i]);
-      return obj;
-    });
+const data = [
+  {
+    nom: "Image 1",
+    type: "image",
+    url: "https://drive.google.com/uc?export=view&id=1zO4TuQraQJfxnVLhMk9xIfNUGqA3-Efr",
+    tags: "plage, réunion, panneau"
+  },
+  {
+    nom: "Document Google",
+    type: "doc",
+    url: "https://docs.google.com/document/d/e/2PACX-1vSdmxcxIMv-N4YKzNrsLTMB2TCiHDm8Q9hM-32FuaoLwHLkT1v1rtLWtMdswjbKRi659aaTZn4Ut0KP/pub",
+    tags: "texte, test, publication"
   }
+];
 
-  function renderGallery(data) {
-    const gallery = document.getElementById("gallery");
-    gallery.innerHTML = "";
-    data.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <img src="${item.image_directe}" alt="${item.nom}">
-        <h3>${item.nom}</h3>
-        <p>${item.tags}</p>
-        <button onclick="openModal('${item.image_directe}')">🔍 Agrandir</button>
-      `;
-      gallery.appendChild(card);
-    });
-  }
+function renderGallery() {
+  const gallery = document.getElementById("gallery");
+  gallery.innerHTML = "";
+  data.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+    let content = '';
 
-  function setupSearch(data) {
-    const input = document.getElementById("searchInput");
-    input.addEventListener("input", () => {
-      const query = input.value.toLowerCase();
-      const filtered = data.filter(item =>
-        (item.nom || "").toLowerCase().includes(query) ||
-        (item.tags || "").toLowerCase().includes(query)
-      );
-      renderGallery(filtered);
-    });
-  }
+    if (item.type === "image") {
+      content = `<img src="${item.url}" alt="${item.nom}">
+                 <button onclick=\"openModal('${item.url}')\">🔍 Agrandir</button>`;
+    } else if (item.type === "doc") {
+      content = `<iframe src="${item.url}?embedded=true"></iframe>`;
+    }
 
-  function openModal(src) {
-    document.getElementById("modalImage").src = src;
-    document.getElementById("modal").style.display = "flex";
-  }
-
-  function closeModal() {
-    document.getElementById("modal").style.display = "none";
-    document.getElementById("modalImage").src = "";
-  }
-
-  fetchData().then(data => {
-    renderGallery(data);
-    setupSearch(data);
+    card.innerHTML = `
+      <h3>${item.nom}</h3>
+      ${content}
+      <p>${item.tags}</p>
+    `;
+    gallery.appendChild(card);
   });
-</script>
+}
 
+function openModal(src) {
+  document.getElementById("modalImage").src = src;
+  document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("modalImage").src = "";
+}
+
+renderGallery();
+</script>
 </body>
 </html>
