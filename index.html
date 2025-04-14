@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Galerie d'images - Google Sheets</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+      background: #f8f9fa;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .card img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .card h3 {
+      font-size: 16px;
+      margin: 10px 0 5px;
+    }
+    .card p {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Galerie d'images</h1>
+<input type="text" id="searchInput" placeholder="Rechercher par tag ou nom...">
+<div class="gallery" id="gallery"></div>
+
+<script>
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQHb.../pub?output=tsv"; // Remplace avec le lien TSV public
+
+  async function fetchData() {
+    const response = await fetch(SHEET_URL);
+    const text = await response.text();
+    const rows = text.trim().split("\n").map(r => r.split("\t"));
+    const headers = rows[0];
+    const data = rows.slice(1);
+
+    return data.map(row => {
+      let obj = {};
+      headers.forEach((h, i) => obj[h] = row[i]);
+      return obj;
+    });
+  }
+
+  function renderGallery(data) {
+    const gallery = document.getElementById("gallery");
+    gallery.innerHTML = "";
+    data.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="${item['URL de l\'image']}" alt="image">
+        <h3>${item['Nom du fichier']}</h3>
+        <p>${item['Tags générés']}</p>
+      `;
+      gallery.appendChild(card);
+    });
+  }
+
+  function setupSearch(data) {
+    const input = document.getElementById("searchInput");
+    input.addEventListener("input", () => {
+      const query = input.value.toLowerCase();
+      const filtered = data.filter(item =>
+        item['Nom du fichier'].toLowerCase().includes(query) ||
+        item['Tags générés'].toLowerCase().includes(query)
+      );
+      renderGallery(filtered);
+    });
+  }
+
+  fetchData().then(data => {
+    renderGallery(data);
+    setupSearch(data);
+  });
+</script>
+
+</body>
+</html>
