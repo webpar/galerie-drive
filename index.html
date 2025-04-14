@@ -105,10 +105,10 @@
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <img src="${item.url}" alt="${item.nom}">
+        <img src="${item.image_directe}" alt="${item.nom}">
         <h3>${item.nom}</h3>
         <p>${item.tags}</p>
-        <button onclick="openModal('${item.url}')">🔍 Agrandir</button>
+        <button onclick="openModal('${item.image_directe}')">🔍 Agrandir</button>
       `;
       gallery.appendChild(card);
     });
