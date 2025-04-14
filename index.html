@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Galerie Drive - Images directes</title>
+  <title>Galerie Drive - Images depuis Google Sheets</title>
   <style>
     body {
       font-family: sans-serif;
@@ -60,7 +60,7 @@
   </style>
 </head>
 <body>
-<h1>Galerie Drive (images seulement)</h1>
+<h1>Galerie Drive (images depuis Google Sheets)</h1>
 <div class="gallery" id="gallery"></div>
 
 <div id="modal" class="modal" onclick="closeModal()">
@@ -68,26 +68,27 @@
 </div>
 
 <script>
-const data = [
-  {
-    nom: "Image 1",
-    url: "https://drive.google.com/uc?export=view&id=1zO4TuQraQJfxnVLhMk9xIfNUGqA3-Efr",
-    tags: "plage, réunion, panneau"
-  },
-  {
-    nom: "Image 2",
-    url: "https://drive.google.com/uc?export=view&id=11AxJN1BlY9A3R7-KPwmhtjeTwKgPQ2VR",
-    tags: "icône, graphique, noir"
-  }
-];
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrk1ebEfqCbL3YyeHwGcbdyL5LYMynAUortsmSgAKmJdjqS5bP69JAQszKbgs_Tm3SEa1ySJCtDYp6/pub?gid=0&single=true&output=tsv";
 
-function renderGallery() {
+async function fetchData() {
+  const response = await fetch(SHEET_URL);
+  const text = await response.text();
+  const rows = text.trim().split("\n").map(r => r.split("\t"));
+  const headers = rows[0].map(h => h.trim().toLowerCase());
+  const data = rows.slice(1);
+  return data.map(row => {
+    let obj = {};
+    headers.forEach((h, i) => obj[h] = row[i]);
+    return obj;
+  });
+}
+
+function renderGallery(data) {
   const gallery = document.getElementById("gallery");
   gallery.innerHTML = "";
   data.forEach(item => {
     const card = document.createElement("div");
     card.className = "card";
-
     card.innerHTML = `
       <img src="${item.url}" alt="${item.nom}">
       <h3>${item.nom}</h3>
@@ -108,7 +109,7 @@ function closeModal() {
   document.getElementById("modalImage").src = "";
 }
 
-renderGallery();
+fetchData().then(renderGallery);
 </script>
 </body>
 </html>
