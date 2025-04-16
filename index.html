@@ -5,49 +5,107 @@
   <title>Galerie Drive - Images depuis Google Sheets (iframe)</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f5f5f5;
-      margin: 20px;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f5;
+      margin: 0;
+      padding: 0;
     }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    header img {
+      height: 50px;
+    }
+
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+      color: #333;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
     input[type="text"] {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 20px;
+      padding: 12px;
+      margin-bottom: 30px;
       font-size: 16px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 1px solid #ccc;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
+
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
     }
+
     .card {
       background: white;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      transition: transform 0.2s ease;
     }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
     .card iframe {
       width: 100%;
       height: 240px;
       border: none;
       border-radius: 8px;
     }
+
     .card h3 {
       font-size: 16px;
-      margin: 10px 0 5px;
+      margin: 10px 0 4px;
+      color: #222;
     }
+
     .card p {
       font-size: 14px;
-      color: #666;
+      color: #555;
+    }
+
+    .invalid {
+      color: red;
+      text-align: center;
+      padding: 20px;
+      font-weight: bold;
+    }
+
+    @media screen and (max-width: 480px) {
+      .card iframe {
+        height: 180px;
+      }
     }
   </style>
 </head>
 <body>
-<h1>Galerie Drive (images depuis Google Sheets en iframe)</h1>
-<input type="text" id="searchInput" placeholder="Rechercher par nom ou tag...">
-<div class="gallery" id="gallery"></div>
+<header>
+  <img src="https://www.pardon.re/img/logo-1706015409.jpg" alt="Logo Pardon!">
+  <h1>Galerie Pardon! – Images Google Drive</h1>
+</header>
+
+<main>
+  <input type="text" id="searchInput" placeholder="Rechercher par nom ou tag...">
+  <div class="gallery" id="gallery"></div>
+</main>
 
 <script>
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrk1ebEfqCbL3YyeHwGcbdyL5LYMynAUortsmSgAKmJdjqS5bP69JAQszKbgs_Tm3SEa1ySJCtDYp6/pub?gid=0&single=true&output=tsv";
@@ -74,20 +132,19 @@ function renderGallery(data) {
     const card = document.createElement("div");
     card.className = "card";
 
-    // Si l'URL est un lien Google Drive, on extrait l'ID et on affiche dans une iframe
     let content = "";
-    const match = item.image_directe.match(/[-\w]{25,}/);
+    const match = item.image_directe?.match(/[-\w]{25,}/);
     if (match) {
       const id = match[0];
       content = `<iframe src="https://drive.google.com/file/d/${id}/preview" allow="autoplay"></iframe>`;
     } else {
-      content = `<p style='color:red;'>Lien invalide</p>`;
+      content = `<div class="invalid">Lien invalide</div>`;
     }
 
     card.innerHTML = `
-      <h3>${item.nom}</h3>
+      <h3>${item.nom || "Sans nom"}</h3>
       ${content}
-      <p>${item.tags}</p>
+      <p>${item.tags || ""}</p>
     `;
     gallery.appendChild(card);
   });
