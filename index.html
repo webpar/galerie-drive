@@ -176,10 +176,13 @@ const match = item["image_directe"]?.match(/[-\w]{25,}/);
     }
 
     card.innerHTML = `
-      <h3>${item.nom || "Sans nom"}</h3>
-      ${content}
-      <p>${item.tags || ""}</p>
-    `;
+  <h3>${item.nom || "Sans nom"}</h3>
+  ${content}
+    <p><strong>Tags :</strong> ${item["tags"] || ""}</p>
+  <p><strong>Dossier :</strong> ${item["dossiers"] || "-"}</p>
+  <p><strong>Chemin :</strong> ${item["chemin"] || "-"}</p>
+`;
+
     gallery.appendChild(card);
   });
 
