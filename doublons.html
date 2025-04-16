@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
+      input, button { font-size: 16px; padding: 8px; margin: 10px 0; width: 100%; }
+      #resultat { margin-top: 20px; font-size: 16px; color: green; }
+    </style>
+  </head>
+  <body>
+    <h2>🔍 Scan de doublons Google Drive</h2>
+    <label>🔗 ID du dossier Drive :</label>
+    <input type="text" id="folderId" placeholder="Ex: 1AbCDeFgHiJkLmNoPqRsTuVwXyZ" />
+    <button onclick="lancerScan()">Lancer le scan</button>
+
+    <div id="resultat"></div>
+
+    <script>
+      function lancerScan() {
+        const id = document.getElementById("folderId").value;
+        document.getElementById("resultat").innerText = "⏳ Scan en cours...";
+        google.script.run.withSuccessHandler(function(message) {
+          document.getElementById("resultat").innerText = message;
+        }).prefiltrageDoublonsDepuisInterface(id);
+      }
+    </script>
+  </body>
+</html>
