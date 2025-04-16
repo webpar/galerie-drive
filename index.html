@@ -167,7 +167,7 @@ function renderGallery() {
     card.className = "card";
 
     let content = "";
-    const match = item.image_directe?.match(/[-\w]{25,}/);
+const match = item["image_directe"]?.match(/[-\w]{25,}/);
     if (match) {
       const id = match[0];
       content = `<iframe src="https://drive.google.com/file/d/${id}/preview" allow="autoplay"></iframe>`;
