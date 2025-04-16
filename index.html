@@ -39,7 +39,7 @@
     input[type="text"] {
       width: 100%;
       padding: 12px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       font-size: 16px;
       border-radius: 8px;
       border: 1px solid #ccc;
@@ -50,6 +50,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 24px;
+      margin-bottom: 30px;
     }
 
     .card {
@@ -82,11 +83,26 @@
       color: #555;
     }
 
-    .invalid {
-      color: red;
-      text-align: center;
-      padding: 20px;
-      font-weight: bold;
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .pagination button {
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: default;
     }
 
     @media screen and (max-width: 480px) {
@@ -105,11 +121,20 @@
 <main>
   <input type="text" id="searchInput" placeholder="Rechercher par nom ou tag...">
   <div class="gallery" id="gallery"></div>
+  <div class="pagination">
+    <button id="prevBtn">◀ Précédent</button>
+    <span id="pageInfo">Page 1</span>
+    <button id="nextBtn">Suivant ▶</button>
+  </div>
 </main>
 
 <script>
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRrk1ebEfqCbL3YyeHwGcbdyL5LYMynAUortsmSgAKmJdjqS5bP69JAQszKbgs_Tm3SEa1ySJCtDYp6/pub?gid=0&single=true&output=tsv";
+
 let originalData = [];
+let filteredData = [];
+let currentPage = 1;
+const itemsPerPage = 20;
 
 async function fetchData() {
   const response = await fetch(SHEET_URL);
@@ -122,13 +147,22 @@ async function fetchData() {
     headers.forEach((h, i) => obj[h] = row[i]);
     return obj;
   });
-  renderGallery(originalData);
+  filteredData = [...originalData];
+  renderGallery();
 }
 
-function renderGallery(data) {
+function renderGallery() {
   const gallery = document.getElementById("gallery");
+  const pageInfo = document.getElementById("pageInfo");
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
   gallery.innerHTML = "";
-  data.forEach(item => {
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const pageData = filteredData.slice(startIndex, endIndex);
+
+  pageData.forEach(item => {
     const card = document.createElement("div");
     card.className = "card";
 
@@ -148,15 +182,34 @@ function renderGallery(data) {
     `;
     gallery.appendChild(card);
   });
+
+  pageInfo.textContent = `Page ${currentPage} sur ${totalPages}`;
+  document.getElementById("prevBtn").disabled = currentPage === 1;
+  document.getElementById("nextBtn").disabled = currentPage === totalPages;
 }
 
 document.getElementById("searchInput").addEventListener("input", (e) => {
   const query = e.target.value.toLowerCase();
-  const filtered = originalData.filter(item =>
+  filteredData = originalData.filter(item =>
     (item.nom && item.nom.toLowerCase().includes(query)) ||
     (item.tags && item.tags.toLowerCase().includes(query))
   );
-  renderGallery(filtered);
+  currentPage = 1;
+  renderGallery();
+});
+
+document.getElementById("prevBtn").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    renderGallery();
+  }
+});
+
+document.getElementById("nextBtn").addEventListener("click", () => {
+  if (currentPage < Math.ceil(filteredData.length / itemsPerPage)) {
+    currentPage++;
+    renderGallery();
+  }
 });
 
 fetchData();
